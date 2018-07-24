@@ -1,0 +1,13 @@
+
+*.obj
+*.idb
+*.pdb
+*.exe
+*.ilk
+*.tlog
+*.db
+*.opendb
+*.ipch
+*.log
+*.lastcodeanalysissucceeded
+*.xml
