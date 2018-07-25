@@ -2,7 +2,7 @@
 
 using Byte   = uint8_t;
 using Size   = int;
-using Offset = int;
+using Index  = int;
 using Value  = double; // for now all numbers are doubles!
 
 enum OpCode {

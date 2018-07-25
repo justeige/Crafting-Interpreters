@@ -7,5 +7,7 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Debug.h" />
     <ClInclude Include="Common.h" />
+    <ClInclude Include="Value.h" />
+    <ClInclude Include="OpCodes.h" />
   </ItemGroup>
 </Project>

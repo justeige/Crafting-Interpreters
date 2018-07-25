@@ -157,6 +157,8 @@
     <ClInclude Include="Chunk.h" />
     <ClInclude Include="Common.h" />
     <ClInclude Include="Debug.h" />
+    <ClInclude Include="OpCodes.h" />
+    <ClInclude Include="Value.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

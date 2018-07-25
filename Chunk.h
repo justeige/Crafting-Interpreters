@@ -3,12 +3,15 @@
 #include <cstdlib> // for std::realloc
 
 #include "Common.h"
+#include "Value.h"
 
 // chunk := simple dynamic array
 struct Chunk {
+
     Byte* code = nullptr; // byte code
     Size  count = 0;      // elements in the array
     Size  capacity = 0;   // number of allocated elements
+    ValueArray constants = {};
 
     Chunk() = default;
 
@@ -36,6 +39,8 @@ struct Chunk {
     void free()
     {
         grow_array(code, capacity * sizeof(Byte), 0);
+        constants.free();
+        init();
     }
 
     // return a multiple of 8 for a new capacity
@@ -52,6 +57,12 @@ struct Chunk {
         }
 
         return (Byte*) std::realloc(previous, new_size);
+    }
+
+    Index add_const(Value value)
+    {
+        constants.write(value);
+        return constants.count - 1;
     }
 };
 
