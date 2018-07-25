@@ -2,8 +2,7 @@
 #include <stdint.h>
 #include <cstdlib> // for std::realloc
 
-using Byte = uint8_t;
-using Size = int;
+#include "Common.h"
 
 // chunk := simple dynamic array
 struct Chunk {
