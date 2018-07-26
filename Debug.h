@@ -2,6 +2,7 @@
 
 #include "Common.h"
 #include "Chunk.h"
+#include "OpCodes.h"
 
 namespace Debug {
 
@@ -15,26 +16,37 @@ static Index constant_instruction(const char* name, Chunk& chunk, Index offset);
 static void show(Chunk& chunk, const char* name)
 {
     std::printf("%s \n", name);
+    std::printf("=================================\n");
+    std::printf("Index|Line| OpCode        |Values\n");
+    std::printf("=================================\n");
     for (int i = 0; i < chunk.count;/**/) {
         i = show(chunk, i);
     }
 }
 
 // print an instruction at a specific Index
-static Index show(Chunk& chunk, Index Index)
+static Index show(Chunk& chunk, Index offset)
 {
-    std::printf("%04d ", Index);
-    OpCode instruction = (OpCode)chunk.code[Index];
+    std::printf("%04d ", offset);
+
+    if (offset > 0 && chunk.lines[offset] == chunk.lines[offset - 1]) {
+        std::printf("     | ");
+    }
+    else {
+        std::printf("%4d | ", chunk.lines[offset]);
+    }
+
+    OpCode instruction = (OpCode)chunk.code[offset];
     switch (instruction) {
     case OP_Constant:
-        return constant_instruction("OP_CONSTANT", chunk, Index);
+        return constant_instruction("OP_CONSTANT", chunk, offset);
     case OP_Return:
-        return simple_instruction("RETURN", Index);
+        return simple_instruction("RETURN", offset);
     default:
         std::printf("%d unkown opcode!\n", instruction);
         break;
     }
-    return Index + 1;
+    return offset + 1;
 }
 
 // print a simple instruction (returns, breaks, ...)

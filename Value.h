@@ -23,8 +23,8 @@ struct ValueArray {
         // needs new allocation?
         if (capacity < count + 1) {
             auto old_capacity = capacity;
-            capacity = grow_capacity(old_capacity);
-            values = grow_array(values, old_capacity, capacity);
+            capacity = memory::grow_capacity(old_capacity);
+            values   = memory::grow_array(values, old_capacity, capacity);
         }
 
         values[count] = value;
@@ -33,23 +33,8 @@ struct ValueArray {
 
     void free()
     {
-        grow_array(values, capacity * sizeof(Value), 0);
+        memory::grow_array(values, capacity * sizeof(Value), 0);
         init();
     }
 
-    // return a multiple of 8 for a new capacity
-    Size grow_capacity(Size old_capacity, Size grow_factor = 2) const
-    {
-        return old_capacity < 8 ? 8 : old_capacity * grow_factor;
-    }
-
-    Value* grow_array(Value* previous, Size old_size, Size new_size)
-    {
-        if (new_size == 0) {
-            std::free(previous);
-            return nullptr;
-        }
-
-        return (Value*) std::realloc(previous, new_size);
-    }
 };
