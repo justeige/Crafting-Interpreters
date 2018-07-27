@@ -39,7 +39,17 @@ static Index show(Chunk& chunk, Index offset)
     OpCode instruction = (OpCode)chunk.code[offset];
     switch (instruction) {
     case OP_Constant:
-        return constant_instruction("OP_CONSTANT", chunk, offset);
+        return constant_instruction("CONSTANT", chunk, offset);
+    case OP_Negate:
+        return simple_instruction("NEGATE", offset);
+    case OP_Add:
+        return simple_instruction("ADD", offset);
+    case OP_Subtract:
+        return simple_instruction("SUBTRACT", offset);
+    case OP_Multiply:
+        return simple_instruction("MULTIPLY", offset);
+    case OP_Divide:
+        return simple_instruction("Divide", offset);
     case OP_Return:
         return simple_instruction("RETURN", offset);
     default:

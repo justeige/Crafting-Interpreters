@@ -1,5 +1,13 @@
 #pragma once
 
+#define forever for (;;)
+
+#ifdef _DEBUG
+#define WHEN_DEBUG(code) code
+#else
+#define WHEN_DEBUG(code)
+#endif
+
 using Byte   = uint8_t;
 using Size   = int;
 using Index  = int;
