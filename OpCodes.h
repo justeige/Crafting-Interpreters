@@ -1,8 +1,9 @@
 #pragma once
 
-/// TODO make enum class?
-enum OpCode {
-    OP_Constant, //  two bytes: [OpCode][Constant Index]
+#include "Common.h"
+
+enum OpCode : Byte {
+    OP_Constant = 1, //  two bytes: [OpCode][Constant Index]
 
     // binary operations
     OP_Add,
@@ -14,3 +15,5 @@ enum OpCode {
     OP_Negate,
     OP_Return
 };
+
+using OpCodes = std::vector<OpCode>;

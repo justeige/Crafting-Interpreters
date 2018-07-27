@@ -7,7 +7,7 @@
 namespace Debug {
 
 
-static void   show(Chunk& chunk, const char* name);
+static void  show(Chunk& chunk, const char* name);
 static Index show(Chunk& chunk, Index current);
 static Index simple_instruction(const char* name, Index offset);
 static Index constant_instruction(const char* name, Chunk& chunk, Index offset);
@@ -19,7 +19,7 @@ static void show(Chunk& chunk, const char* name)
     std::printf("=================================\n");
     std::printf("Index|Line| OpCode        |Values\n");
     std::printf("=================================\n");
-    for (int i = 0; i < chunk.count;/**/) {
+    for (int i = 0; i < chunk.code.size();/**/) {
         i = show(chunk, i);
     }
 }
@@ -70,7 +70,7 @@ static Index constant_instruction(const char* name, Chunk& chunk, Index offset)
 {
     Byte constant_index = chunk.code[offset + 1];
     std::printf("%-16s %4d '", name, constant_index);
-    std::printf("%g", chunk.constants.values[constant_index]);
+    std::printf("%g", chunk.constants[constant_index]);
     std::printf("'\n");
     return offset + 2; // one for the opcode, one for the index of the value!
 }

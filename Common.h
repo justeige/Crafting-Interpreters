@@ -1,22 +1,22 @@
 #pragma once
 
-#define forever for (;;)
+#include <stdint.h>
+#include <vector>
+#include <deque>
 
-#ifdef _DEBUG
-#define WHEN_DEBUG(code) code
-#else
-#define WHEN_DEBUG(code)
-#endif
+#define forever for (;;)
 
 using Byte   = uint8_t;
 using Size   = int;
 using Index  = int;
 using Value  = double; // for now all numbers are doubles!
 
-namespace memory {
+using Bytes   = std::vector<Byte>;
+using Indices = std::vector<Index>;
+using Values  = std::vector<Value>;
+using ValueStack = std::deque<Value>; // std::stack doesn't allow random access...
 
-// those functions might prove useless and a std::vector for the dynamic arrays would be a lot easier...
-// if there is no deeper learning effect in sight, I might just delete them...
+/*namespace memory {
 
 static Size grow_capacity(Size old_capacity, Size grow_factor = 2)
 {
@@ -34,4 +34,4 @@ T* grow_array(T* previous, Size old_size, Size new_size)
 
     return (T*)std::realloc(previous, new_size);
 }
-}
+}*/
