@@ -3,6 +3,9 @@
 #include <stdint.h>
 #include <vector>
 #include <deque>
+#include <string>
+#include <memory>
+#include <cassert>
 
 #define forever for (;;)
 

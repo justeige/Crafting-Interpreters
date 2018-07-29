@@ -2,7 +2,9 @@
 
 #include "Common.h"
 #include "Chunk.h"
+#include "Scanner.h"
 #include "OpCodes.h"
+#include "Token.h"
 
 enum class InterpretResult {
     Ok,
@@ -15,8 +17,8 @@ struct VM {
 
     Chunk chunks;
     std::size_t ip = 0; // instruction pointer
-
     ValueStack stack;
+    std::unique_ptr<Scanner> scanner;
 
     VM() = default;
 
@@ -47,6 +49,12 @@ struct VM {
         chunks = c;
         ip = 0;
         return run();
+    }
+
+    InterpretResult interpret(std::string const& src)
+    {
+        compile(src);
+        return InterpretResult::Ok;
     }
 
     void print_stack() const
@@ -120,5 +128,27 @@ struct VM {
         }
 
         return InterpretResult::Ok;
+    }
+
+    void compile(std::string const& src)
+    {
+        scanner = std::make_unique<Scanner>(src.c_str());
+
+        int line = -1;
+        forever {
+            Token token = scanner->scan_token();
+            if (token.line != line) {
+                std::printf("%4d ", token.line);
+                line = token.line;
+            }
+            else {
+                std::printf("   | ");
+            }
+            std::printf("%2d '%.*s'\n", token.type, token.length, token.start);
+
+            if (token.type == TOKEN_EOF) { break; }
+
+
+        }
     }
 };
