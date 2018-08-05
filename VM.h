@@ -21,81 +21,76 @@ struct Parser {
     Parser() = default;
 };
 
-/// make enum class ?
-enum Precedence {
-    PREC_NONE,
-    PREC_ASSIGNMENT,  // =
-    PREC_OR,          // or
-    PREC_AND,         // and
-    PREC_EQUALITY,    // == !=
-    PREC_COMPARISON,  // < > <= >=
-    PREC_TERM,        // + -
-    PREC_FACTOR,      // * /
-    PREC_UNARY,       // ! - +
-    PREC_CALL,        // . () []
-    PREC_PRIMARY
+enum class Precedence {
+    None,
+    Assignment,  // =
+    Or,          // or
+    And,         // and
+    Equality,    // == !=
+    Comparison,  // < > <= >=
+    Term,        // + -
+    Factor,      // * /
+    Unary,       // ! - +
+    Call,        // . () []
+    Primary
 };
 
-
-// forward decl. for function ptr
-struct VM;
-
-typedef void (VM::*ParseFn)(); /// change to either 'using' or std::function ...
-
-struct ParseRule {
-    ParseFn prefix;
-    ParseFn infix;
-    Precedence precedence;
-};
-using ParseRules = std::vector<ParseRule>;
 
 
 // virtual machine
 struct VM {
 
-    /// function pointer to member functions will be tricky... not sure if I can have the same design as the book
-    /// implements here...
+    using Prec = Precedence; // just for a little less typing
+    typedef void (VM::*ParseFn)(); /// change to either 'using' or std::function ...
+
+    struct ParseRule {
+        ParseFn prefix;
+        ParseFn infix;
+        Precedence precedence;
+    };
+    using ParseRules = std::vector<ParseRule>;
+
     ParseRules rules = {
-        { &VM::grouping, NULL,    PREC_CALL },       // TOKEN_LEFT_PAREN
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_PAREN
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_LEFT_BRACE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_BRACE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_COMMA
-        { NULL,     NULL,    PREC_CALL },       // TOKEN_DOT
-        { &VM::unary, &VM::binary,  PREC_TERM },       // TOKEN_MINUS
-        { NULL,     &VM::binary,  PREC_TERM },       // TOKEN_PLUS
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_SEMICOLON
-        { NULL,     &VM::binary,  PREC_FACTOR },     // TOKEN_SLASH
-        { NULL,     &VM::binary,  PREC_FACTOR },     // TOKEN_STAR
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_BANG
-        { NULL,     NULL,    PREC_EQUALITY },   // TOKEN_BANG_EQUAL
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_EQUAL
-        { NULL,     NULL,    PREC_EQUALITY },   // TOKEN_EQUAL_EQUAL
-        { NULL,     NULL,    PREC_COMPARISON }, // TOKEN_GREATER
-        { NULL,     NULL,    PREC_COMPARISON }, // TOKEN_GREATER_EQUAL
-        { NULL,     NULL,    PREC_COMPARISON }, // TOKEN_LESS
-        { NULL,     NULL,    PREC_COMPARISON }, // TOKEN_LESS_EQUAL
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_IDENTIFIER
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_STRING
-        { &VM::number,   NULL,    PREC_NONE },       // TOKEN_NUMBER
-        { NULL,     NULL,    PREC_AND },        // TOKEN_AND
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_CLASS
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_ELSE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_FALSE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_FUN
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_FOR
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_IF
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_NIL
-        { NULL,     NULL,    PREC_OR },         // TOKEN_OR
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_PRINT
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_RETURN
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_SUPER
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_THIS
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_TRUE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_VAR
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_WHILE
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_ERROR
-        { NULL,     NULL,    PREC_NONE },       // TOKEN_EOF
+        { &VM::grouping,    nullptr,         Prec::Call },       // TOKEN_LEFT_PAREN
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_RIGHT_PAREN
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_LEFT_BRACE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_RIGHT_BRACE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_COMMA
+        { nullptr,          nullptr,         Prec::Call },       // TOKEN_DOT
+        { &VM::unary,       &VM::binary,     Prec::Term },       // TOKEN_MINUS
+        { nullptr,          &VM::binary,     Prec::Term },       // TOKEN_PLUS
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_SEMICOLON
+        { nullptr,          &VM::binary,     Prec::Factor },     // TOKEN_SLASH
+        { nullptr,          &VM::binary,     Prec::Factor },     // TOKEN_STAR
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_BANG
+        { nullptr,          nullptr,         Prec::Equality },   // TOKEN_BANG_EQUAL
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_EQUAL
+        { nullptr,          nullptr,         Prec::Equality },   // TOKEN_EQUAL_EQUAL
+        { nullptr,          nullptr,         Prec::Comparison }, // TOKEN_GREATER
+        { nullptr,          nullptr,         Prec::Comparison }, // TOKEN_GREATER_EQUAL
+        { nullptr,          nullptr,         Prec::Comparison }, // TOKEN_LESS
+        { nullptr,          nullptr,         Prec::Comparison }, // TOKEN_LESS_EQUAL
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_IDENTIFIER
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_STRING
+        { &VM::number,      nullptr,         Prec::None },       // TOKEN_NUMBER
+        { nullptr,          nullptr,         Prec::And },        // TOKEN_AND
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_CLASS
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_ELSE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_FALSE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_FUN
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_FOR
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_IF
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_NIL
+        { nullptr,          nullptr,         Prec::Or },         // TOKEN_OR
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_PRINT
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_RETURN
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_SUPER
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_THIS
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_TRUE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_VAR
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_WHILE
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_ERROR
+        { nullptr,          nullptr,         Prec::None },       // TOKEN_EOF
     };
 
 
@@ -104,7 +99,6 @@ struct VM {
     ValueStack stack;
     std::unique_ptr<Scanner> scanner;
 
-    // part of compiler!
     Parser parser;
 
     VM() = default;
@@ -234,7 +228,7 @@ struct VM {
 
         advance();
         expression();
-        consume(TOKEN_EOF, "Expected EoF token!");
+        consume(Token::Eof, "Expected EoF token!");
         end_compiler();
 
         return !parser.error_raised;
@@ -247,7 +241,7 @@ struct VM {
 
         forever {
             parser.current = scanner->scan_token();
-            if (parser.current.type != TOKEN_ERROR) { break; }
+            if (parser.current.type != Token::Error) { break; }
 
             error_at_current(parser.current.start);
         }
@@ -270,10 +264,10 @@ struct VM {
 
         std::fprintf(stderr, "[line %d] Error", token->line);
 
-        if (token->type == TOKEN_EOF) {
+        if (token->type == Token::Eof) {
             std::fprintf(stderr, " at end");
         }
-        else if (token->type == TOKEN_ERROR) {
+        else if (token->type == Token::Error) {
             // Nothing.
         }
         else {
@@ -284,7 +278,7 @@ struct VM {
         parser.error_raised = true;
     }
 
-    void consume(TokenType type, const char* msg)
+    void consume(Token::Type type, const char* msg)
     {
         if (parser.current.type == type) {
             advance();
@@ -296,7 +290,7 @@ struct VM {
 
     void expression()
     {
-        parse_precedence(PREC_ASSIGNMENT);
+        parse_precedence(Prec::Assignment);
     }
 
     void number()
@@ -307,7 +301,7 @@ struct VM {
 
     void emit_byte(Byte byte)
     {
-        auto current = current_chunk();
+        auto current = compiling_chunk;
         current->write(byte, parser.previous.line);
     }
 
@@ -318,7 +312,7 @@ struct VM {
 
     Byte make_constant(Value value)
     {
-        auto c = current_chunk();
+        auto c = compiling_chunk;
         auto constant = c->add_const(value);
         if (constant > UINT8_MAX) {
             error("Too many constants in one chunk.");
@@ -331,19 +325,19 @@ struct VM {
     void grouping()
     {
         expression();
-        consume(TOKEN_RIGHT_PAREN, "Expected ')' after expression.");
+        consume(Token::RightParen, "Expected ')' after expression.");
     }
 
     void unary()
     {
-        TokenType operator_type = parser.previous.type;
+        Token::Type operator_type = parser.previous.type;
 
         // compile operand
         expression();
 
         // emit operator instruction
         switch (operator_type) {
-        case TOKEN_MINUS:
+        case Token::Minus:
             emit_byte(OP_Negate);
             break;
         default:
@@ -355,24 +349,25 @@ struct VM {
     void binary()
     {
         // remember operator
-        TokenType operatorType = parser.previous.type;
+        Token::Type operatorType = parser.previous.type;
 
         // compile right operand.
         ParseRule* rule = get_rule(operatorType);
-        parse_precedence((Precedence)(rule->precedence + 1));
+        auto next_prec_level = (int)rule->precedence + 1;
+        parse_precedence((Precedence)(next_prec_level));
 
         // Emit the operator instruction.
         switch (operatorType) {
-        case TOKEN_PLUS:
+        case Token::Plus:
             emit_byte(OP_Add);
             break;
-        case TOKEN_MINUS:
+        case Token::Minus:
             emit_byte(OP_Subtract);
             break;
-        case TOKEN_STAR:
+        case Token::Star:
             emit_byte(OP_Multiply);
             break;
-        case TOKEN_SLASH:
+        case Token::Slash:
             emit_byte(OP_Divide);
             break;
         default:
@@ -380,7 +375,7 @@ struct VM {
         }
     }
 
-    ParseRule* get_rule(TokenType type)
+    ParseRule* get_rule(Token::Type type)
     {
         return &rules[type];
     }
@@ -412,11 +407,6 @@ struct VM {
     }
 
     Chunk* compiling_chunk = nullptr;
-
-    Chunk* current_chunk()
-    {
-        return compiling_chunk;
-    }
 
     void end_compiler()
     {

@@ -17,7 +17,7 @@ struct Scanner {
         start = current;
 
         if (eof()) {
-            return make_token(TOKEN_EOF);
+            return make_token(Token::Eof);
         }
 
         char c = advance();
@@ -29,37 +29,37 @@ struct Scanner {
         switch (c) {
         // one-char lexeme
         case '(':
-            return make_token(TOKEN_LEFT_PAREN);
+            return make_token(Token::LeftParen);
         case ')':
-            return make_token(TOKEN_RIGHT_PAREN);
+            return make_token(Token::RightParen);
         case '{':
-            return make_token(TOKEN_LEFT_BRACE);
+            return make_token(Token::LeftBrace);
         case '}':
-            return make_token(TOKEN_RIGHT_BRACE);
+            return make_token(Token::RightBrace);
         case ';':
-            return make_token(TOKEN_SEMICOLON);
+            return make_token(Token::Semicolon);
         case ',':
-            return make_token(TOKEN_COMMA);
+            return make_token(Token::Comma);
         case '.':
-            return make_token(TOKEN_DOT);
+            return make_token(Token::Dot);
         case '-':
-            return make_token(TOKEN_MINUS);
+            return make_token(Token::Minus);
         case '+':
-            return make_token(TOKEN_PLUS);
+            return make_token(Token::Plus);
         case '/':
-            return make_token(TOKEN_SLASH);
+            return make_token(Token::Slash);
         case '*':
-            return make_token(TOKEN_STAR);
+            return make_token(Token::Star);
 
         // two-char lexeme
         case '!':
-            return make_token(match('=') ? TOKEN_BANG_EQUAL    : TOKEN_BANG);
+            return make_token(match('=') ? Token::BangEqual    : Token::Bang);
         case '=':
-            return make_token(match('=') ? TOKEN_EQUAL_EQUAL   : TOKEN_EQUAL);
+            return make_token(match('=') ? Token::EqualEqual   : Token::Equal);
         case '<':
-            return make_token(match('=') ? TOKEN_LESS_EQUAL    : TOKEN_LESS);
+            return make_token(match('=') ? Token::LessEqual    : Token::Less);
         case '>':
-            return make_token(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
+            return make_token(match('=') ? Token::GreaterEqual : Token::Greater);
 
         // string handling
         case '"':
@@ -77,7 +77,7 @@ struct Scanner {
         return *current == '\0';
     }
 
-    Token make_token(TokenType type)
+    Token make_token(Token::Type type)
     {
         Token token;
         token.type = type;
@@ -91,7 +91,7 @@ struct Scanner {
     Token error_token(const char* msg)
     {
         Token token;
-        token.type = TOKEN_ERROR;
+        token.type = Token::Error;
         token.start = msg;
         token.length = (int)std::strlen(msg);
         token.line = line;
@@ -168,7 +168,7 @@ struct Scanner {
 
         // the closing '"'
         advance();
-        return make_token(TOKEN_STRING);
+        return make_token(Token::String);
     }
 
     Token make_number()
@@ -183,7 +183,7 @@ struct Scanner {
             while (std::isdigit(peek())) { advance(); }
         }
 
-        return make_token(TOKEN_NUMBER);
+        return make_token(Token::Number);
     }
 
     Token make_identifier()
@@ -195,64 +195,64 @@ struct Scanner {
         return make_token(identifier_type());
     }
 
-    TokenType identifier_type()
+    Token::Type identifier_type()
     {
         switch (start[0]) {
         case 'a':
-            return check_keyword(1, 2, "nd", TOKEN_AND);
+            return check_keyword(1, 2, "nd", Token::And);
         case 'c':
-            return check_keyword(1, 4, "lass", TOKEN_CLASS);
+            return check_keyword(1, 4, "lass", Token::Class);
         case 'e':
-            return check_keyword(1, 3, "lse", TOKEN_ELSE);
+            return check_keyword(1, 3, "lse", Token::Else);
         case 'f':
             if (current - start > 1) {
                 switch (start[1]) {
                 case 'a':
-                    return check_keyword(2, 3, "lse", TOKEN_FALSE);
+                    return check_keyword(2, 3, "lse", Token::False);
                 case 'o':
-                    return check_keyword(2, 1, "r", TOKEN_FOR);
+                    return check_keyword(2, 1, "r", Token::For);
                 case 'u':
-                    return check_keyword(2, 1, "n", TOKEN_FUN);
+                    return check_keyword(2, 1, "n", Token::Fun);
                 }
             }
             break;
         case 'i':
-            return check_keyword(1, 1, "f", TOKEN_IF);
+            return check_keyword(1, 1, "f", Token::If);
         case 'n':
-            return check_keyword(1, 2, "il", TOKEN_NIL);
+            return check_keyword(1, 2, "il", Token::Nil);
         case 'o':
-            return check_keyword(1, 1, "r", TOKEN_OR);
+            return check_keyword(1, 1, "r", Token::Or);
         case 'p':
-            return check_keyword(1, 4, "rint", TOKEN_PRINT);
+            return check_keyword(1, 4, "rint", Token::Print);
         case 'r':
-            return check_keyword(1, 5, "eturn", TOKEN_RETURN);
+            return check_keyword(1, 5, "eturn", Token::Return);
         case 's':
-            return check_keyword(1, 4, "uper", TOKEN_SUPER);
+            return check_keyword(1, 4, "uper", Token::Super);
         case 't':
             if (current - start > 1) {
                 switch (start[1]) {
                 case 'h':
-                    return check_keyword(2, 2, "is", TOKEN_THIS);
+                    return check_keyword(2, 2, "is", Token::This);
                 case 'r':
-                    return check_keyword(2, 2, "ue", TOKEN_TRUE);
+                    return check_keyword(2, 2, "ue", Token::True);
                 }
             }
             break;
         case 'v':
-            return check_keyword(1, 2, "ar", TOKEN_VAR);
+            return check_keyword(1, 2, "ar", Token::Var);
         case 'w':
-            return check_keyword(1, 4, "hile", TOKEN_WHILE);
+            return check_keyword(1, 4, "hile", Token::While);
         }
 
-        return TOKEN_IDENTIFIER;
+        return Token::Identifier;
     }
 
-    TokenType check_keyword(int begin, int length, const char* rest, TokenType type)
+    Token::Type check_keyword(int begin, int length, const char* rest, Token::Type type)
     {
         if ((int)(current - start) == begin + length && std::memcmp(start + begin, rest, length) == 0) {
             return type;
         }
 
-        return TOKEN_IDENTIFIER;
+        return Token::Identifier;
     }
 };
