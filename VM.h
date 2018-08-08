@@ -95,6 +95,7 @@ struct VM {
 
 
     Chunk chunk;
+    Chunk* compiling_chunk = nullptr;
     std::size_t ip = 0; // instruction pointer
     ValueStack stack;
     std::unique_ptr<Scanner> scanner;
@@ -405,8 +406,6 @@ struct VM {
         emit_byte(byte1);
         emit_byte(byte2);
     }
-
-    Chunk* compiling_chunk = nullptr;
 
     void end_compiler()
     {
