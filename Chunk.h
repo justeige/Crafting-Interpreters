@@ -2,6 +2,7 @@
 
 
 #include "Common.h"
+#include "Value.h"
 
 // chunk := simple dynamic array
 struct Chunk {

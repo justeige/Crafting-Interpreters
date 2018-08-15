@@ -11,5 +11,6 @@
     <ClInclude Include="VM.h" />
     <ClInclude Include="Token.h" />
     <ClInclude Include="Scanner.h" />
+    <ClInclude Include="Value.h" />
   </ItemGroup>
 </Project>

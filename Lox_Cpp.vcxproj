@@ -160,6 +160,7 @@
     <ClInclude Include="OpCodes.h" />
     <ClInclude Include="Scanner.h" />
     <ClInclude Include="Token.h" />
+    <ClInclude Include="Value.h" />
     <ClInclude Include="VM.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

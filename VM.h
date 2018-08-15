@@ -1,10 +1,13 @@
 #pragma once
 
+#include <stdarg.h> // for va_list, va_start, va_arg, va_end
+
 #include "Common.h"
 #include "Chunk.h"
 #include "Scanner.h"
 #include "OpCodes.h"
 #include "Token.h"
+#include "Value.h"
 
 enum class InterpretResult {
     Ok,
@@ -177,35 +180,68 @@ struct VM {
             }
 
             case OP_Add: {
-                Value a = pop();
-                Value b = pop();
+
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return IR::RuntimeError;
+                }
+
+                Number a = AS_NUMBER(pop());
+                Number b = AS_NUMBER(pop());
                 push(a + b);
                 break;
             }
 
             case OP_Subtract: {
-                Value a = pop();
-                Value b = pop();
+
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return IR::RuntimeError;
+                }
+
+                Number a = AS_NUMBER(pop());
+                Number b = AS_NUMBER(pop());
                 push(a - b);
                 break;
             }
 
             case OP_Multiply: {
-                Value a = pop();
-                Value b = pop();
+
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return IR::RuntimeError;
+                }
+
+                Number a = AS_NUMBER(pop());
+                Number b = AS_NUMBER(pop());
                 push(a * b);
                 break;
             }
 
             case OP_Divide: {
-                Value a = pop();
-                Value b = pop();
+
+                if (!IS_NUMBER(peek(0)) || !IS_NUMBER(peek(1))) {
+                    runtime_error("Operands must be numbers.");
+                    return IR::RuntimeError;
+                }
+
+                Number a = AS_NUMBER(pop());
+                Number b = AS_NUMBER(pop());
+
                 push(a / b);
                 break;
             }
 
             case OP_Negate: {
-                push(-pop());
+
+                if (!IS_NUMBER(peek(0))) {
+                    runtime_error("Operand must be a number!");
+                    return IR::RuntimeError;
+                }
+
+                const auto value = pop();
+                const auto num_value = std::get<double>(value);
+                push(-num_value);
                 break;
             }
 
@@ -220,6 +256,11 @@ struct VM {
         }
 
         return InterpretResult::Ok;
+    }
+
+    Value peek(int distance) const
+    {
+        return stack[distance];
     }
 
     bool compile(std::string const& src, Chunk& chunk)
@@ -277,6 +318,20 @@ struct VM {
 
         std::fprintf(stderr, ": %s\n", msg);
         parser.error_raised = true;
+    }
+
+    void runtime_error(const char* fmt, ...)
+    {
+        va_list args; /// change for variadic template?
+        va_start(args, fmt);
+        vfprintf(stderr, fmt, args);
+        va_end(args);
+        fputs("\n", stderr);
+
+        std::size_t instruction = ip - chunk.code.size();
+        fprintf(stderr, "[line %d] in script}n", chunk.lines[instruction]);
+
+        /// reset_stack
     }
 
     void consume(Token::Type type, const char* msg)
